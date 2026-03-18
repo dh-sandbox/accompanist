@@ -60,11 +60,9 @@ jobs:
               --affected-base-ref=$BASE_REF
 
       - name: Generate coverage reports
-        if: always()
-        run: ./gradlew createDebugUnitTestCoverageReport --continue --no-configuration-cache --stacktrace
+        run: ./gradlew createDebugUnitTestCoverageReport --continue --no-configuration-cache --stacktrace || true
 
       - name: Upload coverage to Qlty
-        if: always()
         uses: qltysh/qlty-action/coverage@v2
         env:
           JACOCO_SOURCE_PATH: adaptive/src/main/java drawablepainter/src/main/java permissions/src/main/java
