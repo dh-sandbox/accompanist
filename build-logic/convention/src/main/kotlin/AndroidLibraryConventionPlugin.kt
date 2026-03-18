@@ -21,6 +21,9 @@ import org.gradle.api.Project
 import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.dependencies
 import org.gradle.kotlin.dsl.kotlin
+import org.gradle.kotlin.dsl.register
+import org.gradle.testing.jacoco.plugins.JacocoPluginExtension
+import org.gradle.testing.jacoco.tasks.JacocoReport
 
 class AndroidLibraryConventionPlugin : Plugin<Project> {
     override fun apply(target: Project) {
@@ -28,6 +31,11 @@ class AndroidLibraryConventionPlugin : Plugin<Project> {
             with(pluginManager) {
                 apply("com.android.library")
                 apply("org.jetbrains.kotlin.android")
+                apply("jacoco")
+            }
+
+            extensions.configure<JacocoPluginExtension> {
+                toolVersion = "0.8.11"
             }
 
             extensions.configure<LibraryExtension> {
@@ -41,6 +49,25 @@ class AndroidLibraryConventionPlugin : Plugin<Project> {
                 // The resource prefix is derived from the module name,
                 // so resources inside ":core:module1" must be prefixed with "core_module1_"
                 resourcePrefix = path.split("""\W""".toRegex()).drop(1).distinct().joinToString(separator = "_").lowercase() + "_"
+            }
+
+            tasks.register<JacocoReport>("jacocoTestReport") {
+                reports {
+                    xml.required.set(true)
+                    html.required.set(false)
+                }
+                sourceDirectories.setFrom(
+                    files("${projectDir}/src/main/java", "${projectDir}/src/main/kotlin")
+                )
+                classDirectories.setFrom(
+                    fileTree("${buildDir}/tmp/kotlin-classes/debug")
+                )
+                executionData.setFrom(
+                    fileTree(buildDir).include("jacoco/testDebugUnitTest.exec")
+                )
+                onlyIf {
+                    executionData.files.any { it.exists() }
+                }
             }
 
             dependencies {
