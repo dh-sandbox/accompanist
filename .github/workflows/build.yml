@@ -59,6 +59,17 @@ jobs:
               --run-affected \
               --affected-base-ref=$BASE_REF
 
+      - name: Generate coverage reports
+        run: ./gradlew createDebugUnitTestCoverageReport --continue --no-configuration-cache --stacktrace || true
+
+      - name: Upload coverage to Qlty
+        uses: qltysh/qlty-action/coverage@v2
+        env:
+          JACOCO_SOURCE_PATH: adaptive/src/main/java drawablepainter/src/main/java permissions/src/main/java
+        with:
+          token: ${{ secrets.QLTY_COVERAGE_TOKEN }}
+          files: "**/build/reports/coverage/test/debug/report.xml"
+
       - name: Upload test results
         if: always()
         uses: actions/upload-artifact@v4
