@@ -34,13 +34,13 @@ jobs:
         run: ./gradlew :adaptive:testDebugUnitTest --no-configuration-cache --stacktrace
 
       - name: Generate coverage reports
-        run: ./gradlew :adaptive:createDebugUnitTestCoverageReport --no-configuration-cache --stacktrace
+        run: ./gradlew :adaptive:jacocoTestReport --no-configuration-cache --stacktrace
 
       - name: Upload coverage to Qlty
         uses: qltysh/qlty-action/coverage@v2
         with:
           token: ${{ secrets.QLTY_COVERAGE_TOKEN }}
-          files: "**/build/reports/coverage/test/debug/report.xml"
+          files: adaptive/build/reports/jacoco/jacocoTestReport/jacocoTestReport.xml
           format: jacoco
         env:
           JACOCO_SOURCE_PATH: adaptive/src/main/java
