@@ -21,6 +21,8 @@ import org.gradle.api.Project
 import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.dependencies
 import org.gradle.kotlin.dsl.kotlin
+import org.gradle.testing.jacoco.plugins.JacocoPluginExtension
+import org.gradle.testing.jacoco.tasks.JacocoReport
 
 class AndroidLibraryConventionPlugin : Plugin<Project> {
     override fun apply(target: Project) {
@@ -28,6 +30,7 @@ class AndroidLibraryConventionPlugin : Plugin<Project> {
             with(pluginManager) {
                 apply("com.android.library")
                 apply("org.jetbrains.kotlin.android")
+                apply("jacoco")
             }
 
             extensions.configure<LibraryExtension> {
@@ -52,6 +55,24 @@ class AndroidLibraryConventionPlugin : Plugin<Project> {
             dependencies {
                 add("androidTestImplementation", kotlin("test"))
                 add("testImplementation", kotlin("test"))
+            }
+
+            tasks.register("jacocoTestReport", JacocoReport::class.java) {
+                dependsOn("testDebugUnitTest")
+
+                reports {
+                    xml.required.set(true)
+                    html.required.set(false)
+                }
+
+                val mainSrc = "${projectDir}/src/main/java"
+                sourceDirectories.setFrom(files(mainSrc))
+
+                val debugTree = fileTree("${buildDir}/tmp/kotlin-classes/debug")
+                classDirectories.setFrom(debugTree)
+
+                val execFile = file("${buildDir}/outputs/unit_test_code_coverage/debugUnitTest/testDebugUnitTest.exec")
+                executionData.setFrom(files(execFile))
             }
         }
     }
