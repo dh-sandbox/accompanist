@@ -33,6 +33,15 @@ jobs:
       - name: Unit Tests with coverage
         run: ./gradlew :adaptive:testDebugUnitTest --no-configuration-cache --stacktrace
 
+      - name: Debug coverage artifacts
+        run: |
+          echo "=== Exec file ==="
+          find . -name "*.exec" -ls
+          echo "=== Class directories ==="
+          ls -la adaptive/build/tmp/kotlin-classes/debug/ 2>/dev/null || echo "kotlin-classes/debug not found"
+          ls -la adaptive/build/intermediates/javac/debug/classes/ 2>/dev/null || echo "javac/debug/classes not found"
+          find adaptive/build -type d -name "classes" -o -type d -name "kotlin-classes" 2>/dev/null | head -20
+
       - name: Generate coverage reports
         run: ./gradlew :adaptive:jacocoTestReport --no-configuration-cache --stacktrace
 
