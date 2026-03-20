@@ -37,10 +37,14 @@ jobs:
         run: |
           echo "=== Exec file ==="
           find . -name "*.exec" -ls
-          echo "=== Class directories ==="
-          ls -la adaptive/build/tmp/kotlin-classes/debug/ 2>/dev/null || echo "kotlin-classes/debug not found"
-          ls -la adaptive/build/intermediates/javac/debug/classes/ 2>/dev/null || echo "javac/debug/classes not found"
-          find adaptive/build -type d -name "classes" -o -type d -name "kotlin-classes" 2>/dev/null | head -20
+          echo "=== All class dirs ==="
+          find adaptive/build -type d -name "classes" | head -20
+          echo "=== intermediates classes ==="
+          find adaptive/build/intermediates -type d -name "classes" -ls 2>/dev/null | head -20
+          echo "=== jacoco instrumented classes ==="
+          find adaptive/build -path "*jacoco*" -ls 2>/dev/null | head -20
+          echo "=== ASM/instrumented ==="
+          find adaptive/build/intermediates -type d | head -40
 
       - name: Generate coverage reports
         run: ./gradlew :adaptive:jacocoTestReport --no-configuration-cache --stacktrace
