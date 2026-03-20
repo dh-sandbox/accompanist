@@ -30,11 +30,11 @@ jobs:
       - name: Setup Gradle
         uses: gradle/gradle-build-action@v2
 
-      - name: Unit Tests
-        run: ./gradlew testDebugUnitTest --continue --no-configuration-cache --stacktrace
+      - name: Unit Tests with coverage
+        run: ./gradlew :adaptive:testDebugUnitTest --no-configuration-cache --stacktrace
 
       - name: Generate coverage reports
-        run: ./gradlew createDebugUnitTestCoverageReport --continue --no-configuration-cache --stacktrace
+        run: ./gradlew :adaptive:createDebugUnitTestCoverageReport --no-configuration-cache --stacktrace
 
       - name: Upload coverage to Qlty
         uses: qltysh/qlty-action/coverage@v2
